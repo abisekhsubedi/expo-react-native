@@ -1,7 +1,8 @@
 import React from "react";
 import { StatusBar } from "expo-status-bar";
-import { Image, StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { Image, StyleSheet, Text, View, TouchableOpacity, Platform } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import * as Sharing from "expo-sharing";
 const gradientPngUri =
   "https://images.unsplash.com/photo-1604079628040-94301bb21b91?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80";
 export default function App() {
@@ -16,10 +17,16 @@ export default function App() {
       return;
     }
     const pickerResult = await ImagePicker.launchImageLibraryAsync();
-
     if (pickerResult.cancelled === true) return;
 
     setSelectedImage({ localUri: pickerResult.uri });
+  };
+  const openShareDialogAsync = async () => {
+    if (Platform.OS === 'web') {
+        alert('sharing isn\'t available on your platform');
+        return;
+    }
+    await Sharing.shareAsync(selectedImage.localUri)
   };
 
   if (selectedImage !== null) {
@@ -29,6 +36,12 @@ export default function App() {
           source={{ uri: selectedImage.localUri }}
           style={styles.thumbnail}
         />
+        <TouchableOpacity
+            onPress={openShareDialogAsync}
+            style={styles.button}
+        >
+            <Text style={styles.buttonTxt}> Share this photo</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -63,7 +76,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   button: {
-    backgroundColor: "#AFCAE2ff",
+    backgroundColor: "royalblue",
     marginTop: 24,
     borderRadius: 8,
     paddingTop: 12,
@@ -73,7 +86,7 @@ const styles = StyleSheet.create({
   },
   buttonTxt: {
     fontSize: 18,
-    color: "#444",
+    color: "white",
   },
   thumbnail: {
     width: 200,
